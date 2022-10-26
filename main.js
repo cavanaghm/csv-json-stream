@@ -1,8 +1,7 @@
-const fs = require('fs');
 const Transform = require('stream').Transform;
 
+
 const parser = new Transform();
-const stream = fs.createReadStream('./data.csv');
 
 const utf8 = new TextEncoder();
 
@@ -21,7 +20,7 @@ parser._transform = function(data, encoding, done){
   done();
 }
 
-function chunkSlice(chunk, tail){
+function chunkSlice (chunk, tail){
   const indexOfLastNewLine = chunk.lastIndexOf(endl);
   const size = chunk.byteLength;
   const tailSize = tail?.byteLength || 0;
@@ -34,6 +33,7 @@ function chunkSlice(chunk, tail){
     chunk.slice(indexOfLastNewLine),
   ]
 }
+
 
 function processChunk (chunk){
   let idx = 0;
@@ -68,7 +68,10 @@ function setTitles (data) {
   return data.slice(idx)
 }
 
-
-console.time("test");
-stream.pipe(parser);
-console.timeEnd("test");
+module.exports = async function csvStreamToJson(stream) {
+  return await new Promise((resolve, reject)=> {
+    stream.pipe(parser)
+    stream.on('error', reject)
+    stream.on('end', ()=>resolve(outputdata))
+  })
+}
