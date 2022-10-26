@@ -1,5 +1,7 @@
 const Transform = require('stream').Transform;
+const ObjectStore = require('./objectStore');
 
+const store = new ObjectStore(()=>({}));
 
 const parser = new Transform();
 
@@ -42,7 +44,7 @@ function processChunk (chunk){
   while (idx < chunk.byteLength - 1) {
     let col = 0;
     nextLine = chunk.indexOf(endl, idx);
-    const out = new Object();
+    const out = store.get();
     while (idx < nextLine && nextLine < chunk.byteLength - 1) {
       nextIdx = Math.min(chunk.indexOf(comma, idx), nextLine)
       out[titles[col]] = chunk.slice(idx, nextIdx).toString();
@@ -51,6 +53,7 @@ function processChunk (chunk){
     }
     idx = nextLine + 1;
     outputdata.push(out);
+    store.store(out);
   }
 };
 
