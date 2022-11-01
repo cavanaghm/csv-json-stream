@@ -75,6 +75,8 @@ module.exports = async function csvStreamToJson(stream) {
   return await new Promise((resolve, reject)=> {
     stream.pipe(parser)
     stream.on('error', reject)
-    stream.on('end', ()=>resolve(outputdata))
+    stream.on('end', ()=>{
+      return resolve(outputdata)
+    })
   })
 }
